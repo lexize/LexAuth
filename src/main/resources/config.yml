@@ -1,0 +1,20 @@
+type_pincode_message: <color:#c5ffa8>Введите пинкод:</color>
+type_password_message: <color:#c5ffa8>Введите пароль:</color>
+
+registration_select_pass_type_message: <color:#c5ffa8>Выберите тип пароля:</color>
+registration_select_password: <color:#5eff81><hover:show_text:'Пароль, который вы при заходе просто вводите в чат'>[Текстовый пароль]</hover></color>
+registration_select_pincode: <color:#5eff81><hover:show_text:'Цифровой пароль который вы вводите нажатиями на кнопки'>[Пинкод]</hover></color>
+registration_select_item_queue: <color:#5eff81><hover:show_text:'Последовательность предметов которую вы вводите в отдельном инвентаре'>[Последовательность предметов]</hover></color>
+
+pin_length_too_small: <color:#c5ffa8>Длина вашего пинкода должна быть равна или больше 4!</color>
+pass_length_too_small: <color:#c5ffa8>Длина вашего пароля должна быть равна или больше 6!</color>
+item_length_too_small: <color:#c5ffa8>Длина вашей\n последовательности\nдолжна быть равна\nили больше 3!</color>
+
+reregister_kick_message: <color:#c5ffa8>Теперь при заходе в игру вы сможете заново пройти регистрацию</color>
+item_pass_close_kick_message: <color:#c5ffa8>Для того что бы продолжить вы должны ввести последовательность</color>
+login_message: <color:#c5ffa8>Вы успешно вошли в аккаунт</color>
+wrong_password_message: <color:#ffc5a8>Введён неправильный пароль!</color>
+login_complete: <color:#c5ffa8>Вы успешно зарегистрировали свой аккаунт</color>
+
+item_login_erase_queue: <color:#ffc5a8>Очистить очередь</color>
+item_login_confirm_queue: <color:#c5ffa8>Закончить регистрацию</color>

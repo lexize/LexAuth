@@ -1,0 +1,8 @@
+name: LexAuth
+main: org.lexize.lexauth.LexAuth
+version: 1.0
+api-version: 1.18
+commands:
+  reg: {}
+  reregister: {}
+  test_item_window: {}

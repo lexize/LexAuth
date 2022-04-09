@@ -51,7 +51,6 @@ public class Utils {
     public static void SendRegMessage(Player player) {
         ClickEvent passwd = ClickEvent.runCommand("/reg tppasswd");
         ClickEvent pincode = ClickEvent.runCommand("/reg tppincode");
-        ClickEvent item = ClickEvent.runCommand("/reg tpitem");
         Component message =
                 MiniMessage.miniMessage()
                         .deserialize(LexAuth.Config.getString("registration_select_pass_type_message"))
@@ -59,9 +58,6 @@ public class Utils {
                         .append(MiniMessage.miniMessage().deserialize(LexAuth.Config.getString("registration_select_password")).clickEvent(passwd))
                         .append(Component.newline())
                         .append(MiniMessage.miniMessage().deserialize(LexAuth.Config.getString("registration_select_pincode")).clickEvent(pincode))
-                        .append(Component.newline())
-                        .append(MiniMessage.miniMessage().deserialize(LexAuth.Config.getString("registration_select_item_queue")).clickEvent(item))
-
                 ;
         player.sendMessage(message);
     }

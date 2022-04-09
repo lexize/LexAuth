@@ -15,7 +15,7 @@ public class ItemRegistrationListener implements Listener {
     public void OnClick(InventoryClickEvent event) {
         String uuid = event.getWhoClicked().getUniqueId().toString();
         if (LexAuth.ItemRegistrationSessions.containsKey(uuid)) {
-            event.setResult(Event.Result.DENY);
+            event.setCancelled(true);
             ItemRegistrationSession session = LexAuth.ItemRegistrationSessions.get(uuid);
             session.ComputeClick(event.getSlot());
         }

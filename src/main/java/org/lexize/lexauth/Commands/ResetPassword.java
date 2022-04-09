@@ -13,7 +13,7 @@ public class ResetPassword implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
         Player pl = (Player) commandSender;
         String uuid = pl.getUniqueId().toString();
-        if (LexAuth.Accounts.containsKey(uuid)) {
+        if (LexAuth.Accounts.containsKey(uuid) && LexAuth.Logged.get(uuid)) {
             LexAuth.Accounts.remove(uuid);
             LexAuth.Logged.remove(uuid);
             pl.kick(MiniMessage.miniMessage().deserialize(LexAuth.Config.getString("reregister_kick_message")));

@@ -22,11 +22,6 @@ import org.lexize.lexauth.Utils;
 import java.time.Instant;
 
 public class LexAuthListener implements Listener {
-    @EventHandler
-    public void onLogin(PlayerLoginEvent event) {
-        if (LexAuth.Accounts == null || LexAuth.Registrations == null || LexAuth.Logged == null)
-        event.getPlayer().kick(Component.text("Login system not initialized"));
-    }
     @EventHandler(priority = EventPriority.HIGHEST)
     public void OnJoin(PlayerJoinEvent event) {
         //Checking if logon system is initialized
@@ -38,6 +33,9 @@ public class LexAuthListener implements Listener {
                 UserPassword passwd = LexAuth.Accounts.get(pl.getUniqueId().toString());
                 String ip = pl.getAddress().getHostString();
                 if (!passwd.LastIP.equals(ip) || passwd.LastJoin < Instant.now().toEpochMilli() - (1000*360)) {
+                    String uuid = pl.getUniqueId().toString();
+                    LexAuth.PlayerIventorySaves.put(uuid, pl.getInventory().getContents());
+                    pl.getInventory().clear();
                     LexAuth.Logged.put(pl.getUniqueId().toString(), false);
                     LoginSession session = new LoginSession();
                     session.NeededPassword = passwd.Password;
@@ -45,8 +43,7 @@ public class LexAuthListener implements Listener {
                     LexAuth.LoginSession.put(pl.getUniqueId().toString(), session);
                     switch (passwd.PasswordType) {
                         case PIN: Utils.SendPincodeMessage(pl); break;
-                        case TEXT: Utils.SendPasswordMessage(pl); break;
-                        case ITEM: Utils.StartItemLoginSession(pl); break;
+                        case AUTH: Utils.SendAuthLoginMessage(pl);
                     }
                 }
                 else {
@@ -57,6 +54,20 @@ public class LexAuthListener implements Listener {
                 Utils.StartRegistration(pl);
             }
 
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void OnLeave(PlayerQuitEvent event) {
+        Player pl = event.getPlayer();
+        String uuid = pl.getUniqueId().toString();
+        if (LexAuth.PlayerIventorySaves.containsKey(uuid)) {
+            try {
+                pl.getInventory().setContents(LexAuth.PlayerIventorySaves.get(uuid));
+            }
+            catch (Exception ignored) {
+
+            }
+        }
     }
 
     @EventHandler
@@ -122,44 +133,15 @@ public class LexAuthListener implements Listener {
         Player pl = event.getPlayer();
         if (!LexAuth.Accounts.containsKey(pl.getUniqueId().toString()) || !LexAuth.Logged.get(pl.getUniqueId().toString())) {
             event.setCancelled(true);
-            String uuid = pl.getUniqueId().toString();
-            String message = PlainTextComponentSerializer.plainText().serialize(event.originalMessage());
-            if (!LexAuth.Accounts.containsKey(uuid)) {
-                Registration reg = LexAuth.Registrations.get(uuid);
-                if (reg.PasswordType.equals(PasswordTypeEnum.TEXT)) {
-                    if (message.length() >= 4) {
-                        reg.Password = message;
-                        UserPassword passwd = new UserPassword();
-                        passwd.PasswordType = PasswordTypeEnum.TEXT;
-                        passwd.Password = reg.Password;
-                        passwd.LastIP = pl.getAddress().getHostString();
-                        passwd.LastJoin = Instant.now().toEpochMilli();
-                        LexAuth.Registrations.remove(uuid);
-                        LexAuth.Accounts.put(uuid, passwd);
-                        LexAuth.Logged.put(uuid, true);
-                        Utils.SendCompleteRegMessage(pl);
-                    }
-                    else {
-                        pl.sendMessage(MiniMessage.miniMessage().deserialize("pass_length_too_small"));
-                    }
-                }
-
-            }
-            else {
-                LoginSession logSess = LexAuth.LoginSession.get(uuid);
-                if (logSess.NeededPassword.equals(message)) {
-                    UserPassword passwd = LexAuth.Accounts.get(uuid);
-                    passwd.LastIP = pl.getAddress().getHostString();
-                    passwd.LastJoin = Instant.now().toEpochMilli();
-                    LexAuth.Accounts.put(uuid, passwd);
-                    LexAuth.Logged.put(uuid, true);
-                    Utils.SendLoginMessage(pl);
-                }
-                else {
-                    Utils.SendWrongPasswordMessage(pl);
-                }
-            }
         }
     }
 
+    @EventHandler
+    public void OnPlayerEvent(PlayerCommandPreprocessEvent event) {
+        Player pl = event.getPlayer();
+        String uuid = pl.getUniqueId().toString();
+        if (!(LexAuth.Accounts.containsKey(uuid) && LexAuth.Logged.get(uuid)) && !(event.getMessage().startsWith("/reg") || event.getMessage().startsWith("/auth"))) {
+            event.setCancelled(true);
+        }
+    }
 }

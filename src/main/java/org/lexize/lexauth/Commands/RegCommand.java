@@ -37,12 +37,7 @@ public class RegCommand implements CommandExecutor {
                 else {
                     sess.CurrentPassword += strings[0];
                     if (sess.NeededPassword.equals(sess.CurrentPassword)) {
-                        LexAuth.Logged.put(uuid, true);
-                        UserPassword passwd = LexAuth.Accounts.get(uuid);
-                        passwd.LastIP = pl.getAddress().getHostString();
-                        passwd.LastJoin = Instant.now().toEpochMilli();
-                        LexAuth.Accounts.put(uuid, passwd);
-                        Utils.SendLoginMessage(pl);
+                        Utils.OnLoginComplete(pl);
                     }
                     else {
                         LexAuth.LoginSession.put(uuid, sess);
@@ -53,17 +48,13 @@ public class RegCommand implements CommandExecutor {
                 Registration reg = LexAuth.Registrations.get(uuid);
                 if (reg.Step == 0) {
                     switch (strings[0]) {
-                        case "tppasswd":
-                            reg.PasswordType = PasswordTypeEnum.TEXT;
-                            Utils.SendPasswordMessage(pl);
-                            break;
                         case "tppincode":
                             reg.PasswordType = PasswordTypeEnum.PIN;
                             Utils.SendRegPincodeMessage(pl);
                             break;
-                        case "tpitem":
-                            reg.PasswordType = PasswordTypeEnum.ITEM;
-                            Utils.StartItemRegistrationSession(pl);
+                        case "tpauth":
+                            reg.PasswordType = PasswordTypeEnum.AUTH;
+                            Utils.SendRegAuthMessage(pl);
                             break;
                     }
                     reg.Step = 1;

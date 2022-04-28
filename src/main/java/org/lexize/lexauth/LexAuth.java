@@ -3,18 +3,18 @@ package org.lexize.lexauth;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.lexize.lexauth.Commands.AdminResetPassword;
+import org.lexize.lexauth.Commands.AuthenticatorCommand;
 import org.lexize.lexauth.Commands.RegCommand;
 import org.lexize.lexauth.Commands.ResetPassword;
-import org.lexize.lexauth.Commands.TestWindowCommand;
 import org.lexize.lexauth.DataHolders.UserPassword;
-import org.lexize.lexauth.Listeners.ItemLoginListener;
-import org.lexize.lexauth.Listeners.ItemRegistrationListener;
 import org.lexize.lexauth.Listeners.LexAuthListener;
-import org.lexize.lexauth.Sessions.ItemLoginSession;
-import org.lexize.lexauth.Sessions.ItemRegistrationSession;
 import org.lexize.lexauth.Sessions.Registration;
 
 import java.io.*;
@@ -31,9 +31,7 @@ public class LexAuth extends JavaPlugin {
     public static FileConfiguration Config;
     public static HashMap<String, Boolean> Logged = new HashMap<>();
     public Gson Json = new GsonBuilder().setPrettyPrinting().create();
-
-    public static HashMap<String, ItemRegistrationSession> ItemRegistrationSessions = new HashMap<>();
-    public static HashMap<String, ItemLoginSession> ItemLoginSessions = new HashMap<>();
+    public static HashMap<String, ItemStack[]> PlayerIventorySaves = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -56,16 +54,29 @@ public class LexAuth extends JavaPlugin {
         }
         getCommand("reg").setExecutor(new RegCommand());
         getCommand("reregister").setExecutor(new ResetPassword());
-        getCommand("test_item_window").setExecutor(new TestWindowCommand());
+        getCommand("areregister").setExecutor(new AdminResetPassword());
+        getCommand("auth").setExecutor(new AuthenticatorCommand());
         Bukkit.getPluginManager().registerEvents(new LexAuthListener(), this);
-        Bukkit.getPluginManager().registerEvents(new ItemRegistrationListener(), this);
-        Bukkit.getPluginManager().registerEvents(new ItemLoginListener(), this);
     }
 
     @Override
     public void onDisable() {
         File accountsFile = new File("accounts.lxa");
         WriteFile(accountsFile, Json.toJson(Accounts));
+
+        for (Player pl:
+             Bukkit.getOnlinePlayers()) {
+            String uuid = pl.getUniqueId().toString();
+            if (LexAuth.PlayerIventorySaves.containsKey(uuid)) {
+                try {
+                    pl.getInventory().setContents(LexAuth.PlayerIventorySaves.get(uuid));
+                }
+                catch (Exception ignored) {
+
+                }
+            }
+            pl.kick(MiniMessage.miniMessage().deserialize(Config.getString("plugin_disable_kick_message")));
+        }
     }
 
     public static boolean WriteFile(File file, String content) {

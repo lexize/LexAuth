@@ -8,5 +8,4 @@ public class UserPassword {
     public String Password;
     public long LastJoin;
     public String LastIP;
-    public Material[] ItemQueue;
 }

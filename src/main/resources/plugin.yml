@@ -5,4 +5,5 @@ api-version: 1.18
 commands:
   reg: {}
   reregister: {}
-  test_item_window: {}
+  areregister: {}
+  auth: {}
